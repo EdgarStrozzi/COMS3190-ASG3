@@ -23,6 +23,29 @@ let usersCollection;
 let flightsCollection;
 let bookingsCollection;
 
+//! Helper
+async function generateConfirmationNumber() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    while (true) {
+        let confirmationNumber = "";
+
+        for (let i = 0; i < 6; i++) {
+            confirmationNumber += chars.charAt(
+                Math.floor(Math.random() * chars.length)
+            );
+        }
+
+        const existingBooking = await bookingsCollection.findOne({
+            confirmationNumber: confirmationNumber,
+        });
+
+        if (!existingBooking) {
+            return confirmationNumber;
+        }
+    }
+}
+
 //! Test for connection 
 async function connectToMongo() {
     try {
@@ -132,7 +155,96 @@ app.get("/bookings/confirmation/:confirmationNumber", async (req, res) => {
     }
 });
 
-//* MARK: SignUp
+//* MARK: POST booking
+app.post("/bookings", async (req, res) => {
+    try {
+        const { userId, flightId, passengers, seatsBooked, totalAmount } = req.body;
+
+        if (!flightId || !passengers || !seatsBooked || !totalAmount) {
+            return res.status(400).send({
+                message: "Missing required booking information.",
+            });
+        }
+
+        if (!Array.isArray(passengers) || passengers.length === 0) {
+            return res.status(400).send({
+                message: "At least one passenger is required.",
+            });
+        }
+
+        const flight = await flightsCollection.findOne({
+            id: Number(flightId),
+        });
+
+        if (!flight) {
+            return res.status(404).send({
+                message: "Flight not found.",
+            });
+        }
+
+        for (const seatClass in seatsBooked) {
+            const requestedSeats = Number(seatsBooked[seatClass]);
+
+            if (Number.isNaN(requestedSeats) || requestedSeats <= 0) {
+                return res.status(400).send({
+                    message: "Seat count must be greater than 0.",
+                });
+            }
+
+            if (!flight.seats[seatClass]) {
+                return res.status(400).send({
+                    message: `Invalid seat class: ${seatClass}`,
+                });
+            }
+
+            if (requestedSeats > flight.seats[seatClass].available) {
+                return res.status(400).send({
+                    message: `Not enough seats available in ${seatClass}.`,
+                });
+            }
+        }
+
+        const confirmationNumber = await generateConfirmationNumber();
+
+        const newBooking = {
+            userId: userId || null,
+            flightId: Number(flightId),
+            passengers: passengers,
+            seatsBooked: seatsBooked,
+            totalAmount: Number(totalAmount),
+            confirmationNumber: confirmationNumber,
+            createdAt: new Date(),
+        };
+
+        const bookingResult = await bookingsCollection.insertOne(newBooking);
+
+        const seatUpdates = {};
+
+        for (const seatClass in seatsBooked) {
+            seatUpdates[`seats.${seatClass}.available`] =
+                -Number(seatsBooked[seatClass]);
+        }
+
+        await flightsCollection.updateOne(
+            { id: Number(flightId) },
+            { $inc: seatUpdates }
+        );
+
+        res.status(201).send({
+            message: "Booking created successfully.",
+            bookingId: bookingResult.insertedId,
+            confirmationNumber: confirmationNumber,
+            booking: newBooking,
+        });
+    } catch (error) {
+        console.error("Error creating booking:", error);
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+});
+
+//* MARK: POST SignUp
 app.post("/auth/signup", async (req, res) => {
     try {
         //! Check User Fields
