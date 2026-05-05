@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 const FlightLookup = () => {
     const navigate = useNavigate();
+    const [flights, setFlights] = useState([]);
+
     const [formData, setFormData] = useState({
         destination: "",
         date: "",
@@ -28,6 +30,7 @@ const FlightLookup = () => {
             
             const data = await response.json();
             console.log("Flight results:", data);
+            setFlights(data);
             
         } catch (error) {
             console.error("Error fetching flights:", error);
@@ -68,6 +71,35 @@ const FlightLookup = () => {
         </div>
         </div>
         </form>
+        <div className="list">
+
+            <div className="mt-6 text-white">
+                <ul role="list" className="divide-y divide-gray-100">
+  {flights.length === 0 ? (
+    <li>
+    <p>No flights found</p>
+    </li>
+  ) : (
+    flights.map((f) => (
+        <li key={f.id} className="flex justify-between gap-x-6 py-5">
+      <div className="flex min-w-0 gap-x-4">
+        <div className="min-w-0 flex-auto">
+        <p className="text-sm/6 font-semibold text-gray-900">{f.flightNumber} — {f.origin} → {f.destination}</p>
+        <p className="mt-1 truncate text-xs/5 text-gray-500">Departs: {f.departureTime}</p>
+        <p className="mt-1 truncate text-xs/5 text-gray-500">Arrives: {f.arrivalTime}</p>
+        <p className="mt-1 truncate text-xs/5 text-gray-500">{f.seats.economy.available} economy seats at ${f.seats.economy.price}</p>
+        <p className="mt-1 truncate text-xs/5 text-gray-500">{f.seats.premiumEconomy.available} premium economy seats at ${f.seats.premiumEconomy.price}</p>
+        <p className="mt-1 truncate text-xs/5 text-gray-500">{f.seats.firstClass.available} first class seats at ${f.seats.firstClass.price}</p>
+        </div>
+        </div>
+      </li>
+
+    ))
+  )}
+  </ul>
+</div>
+
+        </div>
         </div>
     )
 }
