@@ -34,21 +34,97 @@ app.get("/listFlights", async (req, res) => {
     res.status(200).send(results);
 }
 )
+app.get("/flights", async (req, res) => {
+    try {
+        await client.connect();
+        const flights = db.collection("flights");
+
+        const { destination, date } = req.query;
+
+        if (!destination || !date) {
+            return res.status(400).json({
+                message: "destination and date are required"
+            });
+        }
+
+        // Match destination AND departure date
+        const results = await flights.find({
+            destination: destination.toUpperCase(),
+            departureTime: { $regex: `^${date}` }   // matches YYYY-MM-DD at start
+        }).toArray();
+
+        return res.status(200).json(results);
+
+    } catch (error) {
+        console.error("Error fetching flights:", error);
+        return res.status(500).json({ message: "Server error" });
+    } finally {
+        await client.close();
+    }
+});
+app.post("/loginUser", async (req, res) => {
+    try {
+        await client.connect();
+        const keys = Object.keys(req.body);
+        const values = Object.values(req.body);
+        //check for new user
+        const users = db.collection("users");
+        const existing = await users.findOne({ email: req.body.email });
+        console.log(existing);
+
+        if (existing) {
+            //console.log(existing);
+            console.log("form:" + req.body.username + "existing:" + existing.name);
+            if(existing.name == req.body.username && req.body.password == existing.password){
+                return res.status(409).json({
+                    message: "logging in",
+                    user: existing
+                });
+            } else {
+                return res.status(401).json({ message: "Incorrect name or password" });;
+            }
+        }
+        return res.status(404).json({
+            message: "User does not exist"
+        });
+    } catch (error) {
+        console.error("Could not login" + error);
+        res.status(500);
+        res.send("Error logging in");
+    } finally {
+        await client.close();
+    }
+}
+);
 app.post("/addUser", async (req, res) => {
     try {
         await client.connect();
         const keys = Object.keys(req.body);
         const values = Object.values(req.body);
-        
+        //check for new user
+        const users = db.collection("users");
+        const existing = await users.findOne({ email: req.body.email });
+        console.log(existing);
+
+        if (existing) {
+            console.log(existing);
+            if(existing.name === req.body.name && req.body.password === existing.password){
+                return res.status(409).json({
+                    message: "logging in",
+                    user: existing
+                });
+            } else {
+                return res.status(401).json({ message: "Incorrect name or password" });;
+            }
+        }
+
         const newDocument = {
-            id: req.body.id,
             name: req.body.name,
-            price: req.body.price,
-            description: req.body.description,
-            imageUrl: req.body.imageUrl,
+            email: req.body.email,
+            password: req.body.password,
         };
         console.log(newDocument);
-        const result = await db.collection("robot").insertOne(newDocument);
+        const result = await db.collection("users").insertOne(newDocument);
         res.status(200);
         res.send(result);
     } catch (error) {
@@ -58,5 +134,4 @@ app.post("/addUser", async (req, res) => {
     } finally {
         await client.close();
     }
-}
-);
+});
