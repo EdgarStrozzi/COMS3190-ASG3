@@ -34,6 +34,34 @@ app.get("/listFlights", async (req, res) => {
     res.status(200).send(results);
 }
 )
+app.get("/flights", async (req, res) => {
+    try {
+        await client.connect();
+        const flights = db.collection("flights");
+
+        const { destination, date } = req.query;
+
+        if (!destination || !date) {
+            return res.status(400).json({
+                message: "destination and date are required"
+            });
+        }
+
+        // Match destination AND departure date
+        const results = await flights.find({
+            destination: destination.toUpperCase(),
+            departureTime: { $regex: `^${date}` }   // matches YYYY-MM-DD at start
+        }).toArray();
+
+        return res.status(200).json(results);
+
+    } catch (error) {
+        console.error("Error fetching flights:", error);
+        return res.status(500).json({ message: "Server error" });
+    } finally {
+        await client.close();
+    }
+});
 app.post("/loginUser", async (req, res) => {
     try {
         await client.connect();
