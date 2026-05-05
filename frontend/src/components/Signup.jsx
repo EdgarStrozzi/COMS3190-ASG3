@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 const Signup = () => {
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({ name: "", email: "", password: ""});
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+    });
 
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
@@ -27,7 +31,9 @@ const Signup = () => {
         try {
             const response = await fetch("http://localhost:8080/auth/signup", {
                 method: "POST",
-                headers: {"Content-Type": "application/json",},
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(formData),
             });
 
@@ -50,56 +56,90 @@ const Signup = () => {
     };
 
     return (
-        <main className="page-container">
-            <section className="auth-card">
-                <h1>Create Account</h1>
-                <p className="subtitle">Join Aethera Airways & Start booking.</p>
+        <main className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-12">
+            <section className="w-full max-w-md rounded-3xl bg-white shadow-xl border border-slate-200 overflow-hidden">
+                <div className="bg-[#0B1F3A] px-8 py-7">
+                    <p className="text-[#2EC4B6] text-sm font-semibold tracking-[0.25em] uppercase">
+                        Aethera Airways
+                    </p>
+                    <h1 className="mt-3 text-3xl font-bold text-white">
+                        Create Account
+                    </h1>
+                    <p className="mt-2 text-slate-300">
+                        Sign up to search flights, select seats, and manage bookings.
+                    </p>
+                </div>
 
-                <form onSubmit={handleSubmit} className="form">
-                    <label>
-                        Name
+                <form onSubmit={handleSubmit} className="px-8 py-8 space-y-5">
+                    <div>
+                        <label className="block text-sm font-semibold text-[#0B1F3A] mb-2">
+                            Full Name
+                        </label>
                         <input
                             type="text"
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            placeholder="Enter your full name"
+                            placeholder="Edgar Test"
+                            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-[#0B1F3A] outline-none focus:border-[#2EC4B6] focus:ring-2 focus:ring-[#2EC4B6]/25"
                         />
-                    </label>
+                    </div>
 
-                    <label>
-                        Email
+                    <div>
+                        <label className="block text-sm font-semibold text-[#0B1F3A] mb-2">
+                            Email
+                        </label>
                         <input
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            placeholder="Enter your email"
+                            placeholder="edgar@example.com"
+                            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-[#0B1F3A] outline-none focus:border-[#2EC4B6] focus:ring-2 focus:ring-[#2EC4B6]/25"
                         />
-                    </label>
+                    </div>
 
-                    <label>
-                        Password
+                    <div>
+                        <label className="block text-sm font-semibold text-[#0B1F3A] mb-2">
+                            Password
+                        </label>
                         <input
                             type="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="Create a password"
+                            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-[#0B1F3A] outline-none focus:border-[#2EC4B6] focus:ring-2 focus:ring-[#2EC4B6]/25"
                         />
-                    </label>
+                    </div>
 
-                    {message && <p className="success-message">{message}</p>}
-                    {error && <p className="error-message">{error}</p>}
+                    {message && (
+                        <p className="rounded-xl bg-[#2EC4B6]/10 border border-[#2EC4B6]/30 px-4 py-3 text-sm font-semibold text-[#0B1F3A]">
+                            {message}
+                        </p>
+                    )}
 
-                    <button type="submit" className="primary-button">
+                    {error && (
+                        <p className="rounded-xl bg-[#FF9F1C]/10 border border-[#FF9F1C]/40 px-4 py-3 text-sm font-semibold text-[#0B1F3A]">
+                            {error}
+                        </p>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="w-full rounded-xl bg-[#2EC4B6] px-4 py-3 font-bold text-[#0B1F3A] transition hover:brightness-95"
+                    >
                         Sign Up
                     </button>
-                </form>
 
-                <button className="link-button" onClick={() => navigate("/")}>
-                    I already have an account
-                </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate("/")}
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 font-semibold text-[#0B1F3A] transition hover:border-[#2EC4B6] hover:bg-[#2EC4B6]/10"
+                    >
+                        I already have an account
+                    </button>
+                </form>
             </section>
         </main>
     );
