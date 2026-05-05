@@ -21,6 +21,7 @@ const client = new MongoClient(url);
 const db = client.db(dbName);
 let usersCollection;
 let flightsCollection;
+let bookingsCollection;
 
 //! Test for connection 
 async function connectToMongo() {
@@ -29,7 +30,9 @@ async function connectToMongo() {
         
         usersCollection = db.collection("Users");
         flightsCollection = db.collection("Flights");
-        
+        bookingsCollection = db.collection("Bookings");
+
+        await bookingsCollection.createIndex({ confirmationNumber: 1 }, { unique: true });
         await usersCollection.createIndex({ email: 1 }, { unique: true });
         
         console.log("Connected to MongoDB database:", dbName);
@@ -43,7 +46,7 @@ app.get("/", (req, res) => {
     res.send("Welcome to Aethera Airways API");
 });
 
-//* MARK: GET(all)
+//* MARK: GET(all) Flight
 app.get("/flights", async (req, res) => {
     try {
         const results = await flightsCollection.find({}).limit(10).toArray();
@@ -56,7 +59,7 @@ app.get("/flights", async (req, res) => {
     }
 });
 
-//* MARK: GET(id)
+//* MARK: GET(id) Flight
 app.get("/flights/:id", async (req, res) => {
     try {
         const id = Number(req.params.id);
@@ -79,6 +82,50 @@ app.get("/flights/:id", async (req, res) => {
         res.status(200).send(result);
     } catch (error) {
         console.error("Error getting flight:", error);
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+});
+
+//* MARK: GET(id) Booking
+app.get("/bookings/confirmation/:confirmationNumber", async (req, res) => {
+    try {
+        const confirmationNumber = req.params.confirmationNumber.toUpperCase().trim();
+        const lastName = req.query.lastName;
+
+        if (!confirmationNumber || !lastName) {
+            return res.status(400).send({
+                message: "Confirmation number and last name are required.",
+            });
+        }
+
+        const booking = await bookingsCollection.findOne({
+            confirmationNumber: confirmationNumber,
+        });
+
+        if (!booking) {
+            return res.status(404).send({
+                message: "Booking not found.",
+            });
+        }
+
+        const passengerMatch = booking.passengers.some((passenger) => {
+            return (
+                passenger.lastName &&
+                passenger.lastName.toLowerCase() === lastName.toLowerCase().trim()
+            );
+        });
+
+        if (!passengerMatch) {
+            return res.status(404).send({
+                message: "Booking not found for that confirmation number and last name.",
+            });
+        }
+
+        res.status(200).send(booking);
+    } catch (error) {
+        console.error("Error looking up booking:", error);
         res.status(500).send({
             message: "Internal Server Error",
         });
