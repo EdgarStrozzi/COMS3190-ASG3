@@ -59,7 +59,7 @@ const Signup = () => {
         <main className="min-h-screen flex items-center justify-center px-6 py-12 bg-[#0B1F3A]">
             <section className="grid w-full max-w-5xl overflow-hidden rounded-[2rem] bg-white shadow-2xl md:grid-cols-2">
                 <div className="relative hidden bg-[#0B1F3A] p-10 text-white md:block">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(46,196,182,0.35),transparent_32%),radial-gradient(circle_at_80%_80%,rgba(255,159,28,0.30),transparent_28%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(46,196,182,0.35),transparent_32%)]" />
 
                     <div className="relative z-10 flex h-full flex-col justify-between">
                         <div>
@@ -68,7 +68,7 @@ const Signup = () => {
                             </p>
 
                             <h1 className="mt-8 text-5xl font-bold leading-tight">
-                                Premium travel from the heart of ORD.
+                                Travel from the heart of ORD.
                             </h1>
 
                             <p className="mt-5 max-w-md text-lg leading-8 text-slate-300">
@@ -79,10 +79,10 @@ const Signup = () => {
 
                         <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur">
                             <p className="text-sm font-semibold text-[#FF9F1C]">
-                                Hub-and-spoke network
+                                Notes
                             </p>
                             <p className="mt-2 text-sm text-slate-300">
-                                All routes connect through Chicago O&apos;Hare International Airport.
+                                All routes connect through Chicago ORD.
                             </p>
                         </div>
                     </div>
@@ -113,7 +113,7 @@ const Signup = () => {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                placeholder="Edgar Test"
+                                placeholder="Edgar Strozzi"
                                 className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[#0B1F3A] outline-none transition placeholder:text-slate-400 focus:border-[#2EC4B6] focus:ring-4 focus:ring-[#2EC4B6]/20"
                             />
                         </div>
@@ -127,7 +127,7 @@ const Signup = () => {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                placeholder="edgar@example.com"
+                                placeholder="bigO@example.com"
                                 className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[#0B1F3A] outline-none transition placeholder:text-slate-400 focus:border-[#2EC4B6] focus:ring-4 focus:ring-[#2EC4B6]/20"
                             />
                         </div>
@@ -141,7 +141,7 @@ const Signup = () => {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder="Create a password"
+                                placeholder="Audrey&BigO"
                                 className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[#0B1F3A] outline-none transition placeholder:text-slate-400 focus:border-[#2EC4B6] focus:ring-4 focus:ring-[#2EC4B6]/20"
                             />
                         </div>
@@ -160,7 +160,7 @@ const Signup = () => {
 
                         <button
                             type="submit"
-                            className="w-full rounded-xl bg-[#2EC4B6] px-4 py-3 font-bold text-[#0B1F3A] shadow-lg shadow-[#2EC4B6]/20 transition hover:-translate-y-0.5 hover:brightness-95"
+                            className="w-full rounded-xl bg-[#2EC4B6] px-4 py-3 font-bold text-[#0B1F3A] shadow-lg shadow-[#2EC4B6]/20 transition hover:brightness-95"
                         >
                             Sign Up
                         </button>
