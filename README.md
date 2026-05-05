@@ -6,10 +6,14 @@
 - backend/ → API (Node.js / Express)
 
 ## Team Members
-- Add names and emails here
+Oliver Hinrichs
+oliver11@iastate.edu
+Edgar Strozzi Cuevas
+edgar224@iastate.edu
 
 ## Setup Instructions
-- Add setup steps here
+npm run dev in frontend - takes you to login
+navigate to signup.
 
 ## Notes
 - Any assumptions / known issues
