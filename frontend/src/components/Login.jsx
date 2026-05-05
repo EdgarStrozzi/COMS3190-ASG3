@@ -80,49 +80,93 @@ const Login = () => {
 
 
         
-<div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-  <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-    <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">Sign in to your account</h2>
-  </div>
-
-  <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm/6 font-medium text-gray-100">Username</label>
-        <div className="mt-2">
-            <input type="text" name="username" value={formData.username}
-            onChange={handleChange}
-            placeholder="username" required />
+    <div className="flex min-h-screen flex-col justify-center bg-[#0B1F3A] px-6 py-12 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+            <p className="text-center text-sm font-bold uppercase tracking-[0.30em] text-[#2EC4B6]">
+                Aethera Airways
+            </p>
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
+                Log in to your account
+            </h2>
         </div>
 
-      </div>
-      <div>
-        <label className="block text-sm/6 font-medium text-gray-100">Email address</label>
-        <div className="mt-2">
-            <input type="text" name="email" value={formData.email}
-            onChange={handleChange}
-            placeholder="email" required />
-        </div>
-      </div>
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <div className="rounded-3xl border border-white/10 bg-white p-8 shadow-2xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-semibold text-[#0B1F3A]">
+                            Username
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                type="username"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                placeholder="username"
+                                required
+                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-[#0B1F3A] outline-none placeholder:text-slate-400 focus:border-[#2EC4B6] focus:ring-4 focus:ring-[#2EC4B6]/20"
+                            />
+                        </div>
+                    </div>
 
-      <div>
-        <div className="flex items-center justify-between">
-          <label className="block text-sm/6 font-medium text-gray-100">Password</label>
-        </div>
-        <div className="mt-2">
-             <input type="text" name="password" value={formData.password}
-            onChange={handleChange}
-            placeholder="password" required />
-        
-        </div>
-      </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-[#0B1F3A]">
+                            Email
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="email"
+                                required
+                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-[#0B1F3A] outline-none placeholder:text-slate-400 focus:border-[#2EC4B6] focus:ring-4 focus:ring-[#2EC4B6]/20"
+                            />
+                        </div>
+                    </div>
 
-      <div>
-        <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Sign in</button>
-      </div>
-    </form>
-  </div>
-</div>
+                    <div>
+                        <label className="block text-sm font-semibold text-[#0B1F3A]">
+                            Password
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="password"
+                                required
+                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-[#0B1F3A] outline-none placeholder:text-slate-400 focus:border-[#2EC4B6] focus:ring-4 focus:ring-[#2EC4B6]/20"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            className="flex w-full justify-center rounded-xl bg-[#2EC4B6] px-4 py-3 text-sm font-bold text-[#0B1F3A] shadow-lg shadow-[#2EC4B6]/20 transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2EC4B6]"
+                        >
+                            Sign in
+                        </button>
+                    </div>
+                </form>
+
+                <p className="mt-6 text-center text-sm text-slate-600">
+                    Do not have an account?{" "}
+                    <button
+                        type="button"
+                        onClick={() => navigate("/signup")}
+                        className="font-bold text-[#0B1F3A] underline decoration-[#FF9F1C] decoration-2 underline-offset-4 hover:text-[#2EC4B6]"
+                    >
+                        Sign up
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
 
 
         //</div>
