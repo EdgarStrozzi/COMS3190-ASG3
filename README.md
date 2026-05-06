@@ -1,8 +1,3 @@
-# AH_1
-
-## Project Structure
-
-- frontend/ → UI (React / HTML / CSS)
 - backend/ → API (Node.js / Express)
 
 ## Team Members

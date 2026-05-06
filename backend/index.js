@@ -1,144 +1,104 @@
-var express = require("express");
-var cors = require("cors");
-var app = express();
-var fs = require("fs");
-var bodyParser = require("body-parser");
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
-const port = "8080";
+
+const port = 8080;
 const host = "localhost";
 
-//Add MongoDB
+//! MongoDb
 const { MongoClient } = require("mongodb");
 
-//Add Constants
+//! Constants
 const url = "mongodb://127.0.0.1:27017";
 const dbName = "aethera_airways";
 const client = new MongoClient(url);
+
 const db = client.db(dbName);
-const collection = "flights";
+let usersCollection;
+let flightsCollection;
 
-app.listen(port, () => {
-    console.log("App listening at http://%s:%s",
-    host, port);
+//! Test for connection 
+async function connectToMongo() {
+    try {
+        await client.connect();
+        
+        usersCollection = db.collection("Users");
+        flightsCollection = db.collection("Flights");
+        
+        await usersCollection.createIndex({ email: 1 }, { unique: true });
+        
+        console.log("Connected to MongoDB database:", dbName);
+    } catch (error) {
+        console.error("MongoDB connection failed:", error);
+        process.exit(1);
     }
-);
-
-app.get("/", async (req, res) => {
-    res.send("welcom to aethera")
-    }
-);
-
-app.get("/listFlights", async (req, res) => {
-    await client.connect();
-    const query ={};
-    const results = await db
-    .collection(collection)
-    .find(query)
-    .limit(10)
-    .toArray();
-    
-    res.status(200).send(results);
 }
-)
+
+app.get("/", (req, res) => {
+    res.send("Welcome to Aethera Airways API");
+});
+
+//* MARK: GET(flights)
 app.get("/flights", async (req, res) => {
     try {
-        await client.connect();
-        const flights = db.collection("flights");
-
-        const { destination, date } = req.query;
-
-        if (!destination || !date) {
-            return res.status(400).json({
-                message: "destination and date are required"
-            });
-        }
-
-        // Match destination AND departure date
-        const results = await flights.find({
-            destination: destination.toUpperCase(),
-            departureTime: { $regex: `^${date}` }   // matches YYYY-MM-DD at start
-        }).toArray();
-
-        return res.status(200).json(results);
-
+        const results = await flightsCollection.find({}).limit(10).toArray();
+        res.status(200).send(results);
     } catch (error) {
-        console.error("Error fetching flights:", error);
-        return res.status(500).json({ message: "Server error" });
-    } finally {
-        await client.close();
+        console.error("Could not list flights:", error);
+        res.status(500).send({
+            message: "Error listing flights.",
+        });
     }
 });
-app.post("/loginUser", async (req, res) => {
+
+//* MARK: SignUp
+app.post("/auth/signup", async (req, res) => {
     try {
-        await client.connect();
-        const keys = Object.keys(req.body);
-        const values = Object.values(req.body);
-        //check for new user
-        const users = db.collection("users");
-        const existing = await users.findOne({ email: req.body.email });
-        console.log(existing);
-
-        if (existing) {
-            //console.log(existing);
-            console.log("form:" + req.body.username + "existing:" + existing.name);
-            if(existing.name == req.body.username && req.body.password == existing.password){
-                return res.status(409).json({
-                    message: "logging in",
-                    user: existing
-                });
-            } else {
-                return res.status(401).json({ message: "Incorrect name or password" });;
-            }
+        //! Check User Fields
+        const { name, email, password } = req.body;
+        
+        if (!name || !email || !password) {
+            return res.status(400).send({
+                message: "Name, email, and password are required.",
+            });
         }
-        return res.status(404).json({
-            message: "User does not exist"
-        });
-    } catch (error) {
-        console.error("Could not login" + error);
-        res.status(500);
-        res.send("Error logging in");
-    } finally {
-        await client.close();
-    }
-}
-);
-app.post("/addUser", async (req, res) => {
-    try {
-        await client.connect();
-        const keys = Object.keys(req.body);
-        const values = Object.values(req.body);
-        //check for new user
-        const users = db.collection("users");
-        const existing = await users.findOne({ email: req.body.email });
-        console.log(existing);
-
-        if (existing) {
-            console.log(existing);
-            if(existing.name === req.body.name && req.body.password === existing.password){
-                return res.status(409).json({
-                    message: "logging in",
-                    user: existing
-                });
-            } else {
-                return res.status(401).json({ message: "Incorrect name or password" });;
-            }
+        
+        const normalizedEmail = email.toLowerCase().trim();
+        const existingUser = await usersCollection.findOne({
+            email: normalizedEmail,});
+        
+        if (existingUser) {
+            return res.status(409).send({
+                message: "An account with this email already exists.",
+            });
         }
-
-        const newDocument = {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
+        
+        const newUser = {
+            name: name.trim(),
+            email: normalizedEmail,
+            password: password,
+            createdAt: new Date(),
         };
-        console.log(newDocument);
-        const result = await db.collection("users").insertOne(newDocument);
-        res.status(200);
-        res.send(result);
+
+        //! If all fields are valid -> POST
+        const result = await usersCollection.insertOne(newUser);
+        res.status(201).send(result);
+
     } catch (error) {
-        console.error("Could not add the new Robot" + error);
-        res.status(500);
-        res.send("Error adding new robot");
-    } finally {
-        await client.close();
+        console.error("Signup error:", error);
+        res.status(500).send({
+            message: "Server error during signup.",
+        });
     }
+});
+
+connectToMongo().then(() => {
+    app.listen(port, () => {
+        console.log(`App listening at http://${host}:${port}`);
+    });
 });
