@@ -72,7 +72,24 @@ app.get("/", (req, res) => {
 //* MARK: GET(all) Flight
 app.get("/flights", async (req, res) => {
     try {
-        const results = await flightsCollection.find({}).limit(10).toArray();
+        const { origin, destination, date } = req.query;
+
+        const query = {};
+
+        if (origin) {
+            query.origin = origin.toUpperCase().trim();
+        }
+
+        if (destination) {
+            query.destination = destination.toUpperCase().trim();
+        }
+
+        if (date) {
+            query.departureTime = { $regex: `^${date}` };
+        }
+
+        const results = await flightsCollection.find(query).toArray();
+
         res.status(200).send(results);
     } catch (error) {
         console.error("Could not list flights:", error);
