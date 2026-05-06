@@ -12,7 +12,7 @@ function App() {
     <div className="app-shell">
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/flight-details" element={<FlightDetails />} />
+        <Route path="/flight-details/:id" element={<FlightDetails />} />
         <Route path="/flight-lookup" element={<FlightLookup />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/search-flights" element={<SearchPage />} />
