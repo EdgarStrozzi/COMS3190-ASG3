@@ -292,6 +292,45 @@ app.post("/auth/signup", async (req, res) => {
         }
     });
     
+//* MARK: POST Login
+app.post("/auth/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).send({
+                message: "Email and password are required.",
+            });
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const user = await usersCollection.findOne({
+            email: normalizedEmail,
+        });
+
+        if (!user || user.password !== password) {
+            return res.status(401).send({
+                message: "Invalid email or password.",
+            });
+        }
+
+        res.status(200).send({
+            message: "Login successful.",
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+            },
+        });
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).send({
+            message: "Server error during login.",
+        });
+    }
+});
+
     connectToMongo().then(() => {
         app.listen(port, () => {
             console.log(`App listening at http://${host}:${port}`);
