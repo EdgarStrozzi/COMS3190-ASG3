@@ -9,7 +9,7 @@ import Signup from './components/Signup'
 import './App.css'
 
 function App() {
-
+const [selectedFlight, setSelectedFlight] = useState(null);
   return (
     <>
       <Routes>
@@ -22,13 +22,18 @@ function App() {
         <Route
           path="/flight-details"
           element={
-            <FlightDetails/>
+            <FlightDetails
+            selectedFlight={selectedFlight}
+            setSelectedFlight={setSelectedFlight}
+            />
           }  
         />
         <Route
           path="/flight-lookup"
           element={
-            <FlightLookup/>
+            <FlightLookup
+            setSelectedFlight={setSelectedFlight}
+            />
           }  
         />
         <Route

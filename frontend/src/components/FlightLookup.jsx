@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const FlightLookup = () => {
+const FlightLookup = ({setSelectedFlight}) => {
     const navigate = useNavigate();
     const [flights, setFlights] = useState([]);
 
@@ -30,11 +30,19 @@ const FlightLookup = () => {
             
             const data = await response.json();
             console.log("Flight results:", data);
-            setFlights(data);
+            if (Array.isArray(data)) {
+                setFlights(data);
+            } else {
+                setFlights([]); // clear results on error
+            }
             
         } catch (error) {
             console.error("Error fetching flights:", error);
         }
+    }
+    const selectFlight = (flight) => {
+        setSelectedFlight(flight.id);
+        navigate("/flight-details");
     }
     return (
         <div>
@@ -81,7 +89,7 @@ const FlightLookup = () => {
     </li>
   ) : (
     flights.map((f) => (
-        <li key={f.id} className="flex justify-between gap-x-6 py-5">
+        <li key={f.id} onClick={() => {selectFlight(f)}} className="flex justify-between gap-x-6 py-5">
       <div className="flex min-w-0 gap-x-4">
         <div className="min-w-0 flex-auto">
         <p className="text-sm/6 font-semibold text-gray-900">{f.flightNumber} — {f.origin} → {f.destination}</p>
