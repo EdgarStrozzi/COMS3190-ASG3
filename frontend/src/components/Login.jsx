@@ -1,56 +1,62 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
-        username: "",
         email: "",
         password: "",
     });
+
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
+
     const handleChange = (event) => {
-        const {name, value} = event.target;
+        const { name, value } = event.target;
+
         setFormData((prevState) => ({
             ...prevState,
             [name]: value,
         }));
-    }
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const url = "http://127.0.0.1:8080/loginUser";
+
+        setMessage("");
+        setError("");
+
         try {
-            const response = await fetch(url, {
+            const response = await fetch("http://127.0.0.1:8080/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(formData),
             });
-            if (response.status === 409) {
-                const data = await response.json();
-                console.log("Logging in existing user:", data.user);
-                alert("Welcome back!");
-                return;
-            }
-            
-            if (response.status === 401) {
-                alert("Incorrect name or password");
-                return;
-            }
+
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error("Failed to add new Robot");
+                setError(data.message || "Invalid email or password.");
+                return;
             }
-            const result = await response.json();
-            console.log("Success:", result);
-            //navigate away
+
+            console.log("Logged in user:", data.user);
+            setMessage("Welcome back!");
+
             setFormData({
-                username: "",
                 email: "",
                 password: "",
             });
+
+            setTimeout(() => {
+                navigate("/search-flights");
+            }, 700);
         } catch (error) {
-            console.error("Error:", error);
-            alert("Error adding");
+            console.error("Login error:", error);
+            setError("Could not connect to the server.");
         }
     };
     return (
@@ -93,23 +99,6 @@ const Login = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <div className="rounded-3xl border border-white/10 bg-white p-8 shadow-2xl">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-semibold text-[#0B1F3A]">
-                            Username
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                type="username"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                placeholder="username"
-                                required
-                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-[#0B1F3A] outline-none placeholder:text-slate-400 focus:border-[#2EC4B6] focus:ring-4 focus:ring-[#2EC4B6]/20"
-                            />
-                        </div>
-                    </div>
-
                     <div>
                         <label className="block text-sm font-semibold text-[#0B1F3A]">
                             Email
